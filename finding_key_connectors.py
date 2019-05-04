@@ -1,4 +1,6 @@
 import operator
+import numpy as np
+from collections import Counter, defaultdict
 
 # all available users
 users = [
@@ -47,11 +49,77 @@ total_num_of_users = sum([num_of_friends(user) for user in users])
 avg_num_of_friends = total_num_of_users / len(users)
 
 # Data Scientists You May Know
-def friends_of_friend_ids_bad(user):
-    # return the ids of friends of a friend
-    return [foaf['id']
-            for friend in user['friends']  # for each of user's friends
-            for foaf in friend['friends']]  # get each of _their_ friends
+# User's friends of friend can be suggested as a potential friend to the user
+def not_same_person(user, other_user):
+    # We need to avoid suggesting the same person as potential friend to himself
+    return (user["id"] != other_user["id"])  # returns true if user and the other_user id is not the same
 
 
-friends_of_friend_ids_bad(users[0])
+def is_direct_friend(user, other_user):
+    return all(not_same_person(friend, other_user) for friend in user['friends'])
+
+
+def friends_of_friend_ids(user):
+    return Counter(foaf['id']
+     for friend in user["friends"]
+     for foaf in friend["friends"]  # foaf denotes friends of a friend
+     if  not_same_person(user, foaf) and is_direct_friend(user, foaf))
+
+
+friends_of_friend_ids(users[3])
+
+# Data Scientists Interests
+interests = [
+    (0, "Hadoop"), (0, "Big Data"), (0, "HBase"), (0, "Java"),
+    (0, "Spark"), (0, "Storm"),  (0, "Cassandra"),
+    (1, "NoSQL"), (1, "MongoDB"), (1, "Cassandra"), (1, "HBase"),
+    (1, "Postgres"), (2, "Python"), (2, "scikit-learn"), (2, "scipy"),
+    (2, "numpy"), (2, "statsmodels"), (2, "pandas"), (3, "R"), (3, "Python"),
+    (3, "statistics"), (3, "regression"), (3, "probability"),
+    (4, "machine learning"), (4, "regression"), (4, "decision trees"),
+    (4, "libsvm"), (5, "Python"), (5, "R"), (5, "Java"), (5, "C++"),
+    (5, "Haskell"), (5, "programming languages"), (6, "statistics"),
+    (6, "probability"), (6, "mathematics"), (6, "theory"),
+    (7, "machine learning"), (7, "scikit-learn"), (7, "Mahout"),
+    (7, "neural networks"), (8, "neural networks"), (8, "deep learning"),
+    (8, "Big Data"), (8, "artificial intelligence"), (9, "Hadoop"),
+    (9, "Java"), (9, "MapReduce"), (9, "Big Data")
+]
+
+def data_scientists_who_like(target_interest):
+    # same logic as before, however brief and easy to understand
+    return [user_id for user_id, user_interest in interests if user_interest == target_interest]
+
+data_scientists_who_like("Python")
+
+# keys are interests, values are list of user_ids with that interest
+user_ids_by_interest = defaultdict(list)
+
+for user_id, user_interest in interests:
+    user_ids_by_interest[user_interest].append(user_id)  # since the value is a list, we just append
+
+# And another from users to interests
+interests_by_user_id = defaultdict(list)
+
+for user_id, user_interest in interests:
+    interests_by_user_id[user_id].append(user_interest)
+
+# Who has most interests in common with the given user
+def most_common_interests_with(user):
+    return Counter(user_ids
+                    for interests in interests_by_user_id[user['id']]
+                    for user_ids in user_ids_by_interest[interests]
+                    if (user_ids != user['id']))
+
+
+
+
+
+
+
+
+
+
+
+
+
