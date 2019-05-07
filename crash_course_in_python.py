@@ -535,6 +535,213 @@ all([]) # True, no falsy elements in the list
 all([True, 1, []])
 
 # The Not so Basics
+# little more advanced Python features
+
+# Sorting
+# Every Pyhton list has a sort method that sorts the list in its place. If you
+# don't want to mess up your list, you can use the sorted function, which returns a new list
+x = [4, 1, 2, 3]
+# the original list x has been modified
+x.sort()
+print(x)
+# If you don't want the list to be modified use sorted.
+x = [4, 1, 2, 3]
+y = sorted(x)
+print(x)
+print(y)
+
+x = [4, 1, 2, 3]
+sorted(x,reverse = True)
+x.sort(reverse = True)
+print(x)
+
+# Instead of naively comparing one element with another, we can compare the results of a
+# function
+x = [-4, 1, -2, 3]
+sorted(x)  # ans: [-4, -2, 1, 3]
+# comparing the elements using a function
+sorted(x, key=abs)  # ans: [1, -2, 3, -4]
+sorted(x, key=abs, reverse = True)  # ans: [-4, 3, -2, 1]
+
+document = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. " \
+           "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, " \
+           "when an unknown printer took a galley of type and scrambled it to make a type specimen book. " \
+           "It has survived not only five centuries, but also the leap into electronic typesetting, " \
+           "remaining essentially unchanged. It was popularised in the 1960s with the release of " \
+           "Letraset sheets containing Lorem Ipsum passages, and more recently with desktop " \
+           "publishing software like Aldus PageMaker including versions of Lorem Ipsum."
+
+# count the number of words in the document
+from collections import Counter
+word_counts = Counter(document.lower().split())
+print(type(word_counts), word_counts) # Looks like Counter can be used just like a dictionary
+
+import operator
+print(word_counts)
+sorted(word_counts.items(), key = operator.itemgetter(1), reverse = True)
+
+# List Comprehensions
+# Frequently, you'll want to transform a list into another list,
+# by choosing only certain elements, or by transforming elements,
+# or both. The Pythonic way of doing this is list comprehensions.
+
+lst = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+# list into another list, by choosing only certain elements
+[i for i in lst if i > 5]
+
+even_numbers = [x for x in range(10) if x%2 == 0]
+print(even_numbers)  # ans:  [0, 2, 4, 6, 8]
+squares = [x*x for x in range(6)]
+print(squares)  # [0, 1, 4, 9, 16, 25]
+even_squares = [x*x for x in range(10) if x%2 == 0]
+print(even_squares)
+
+# Turning lists into dictionaries or sets
+# dict comprehensions
+square_dict = {x:x*x for x in range(6)}
+print(square_dict)  # ans: {0: 0, 1: 1, 2: 4, 3: 9, 4: 16, 5: 25}
+print(square_dict.keys())  # ans: dict_keys([0, 1, 2, 3, 4, 5])
+print(square_dict.values()) # ans: dict_values([0, 1, 4, 9, 16, 25])
+
+# Set comprehensions
+square_set = {x*x for x in range(6)}
+print(square_set)  # ans: {0, 1, 4, 9, 16, 25}
+
+# if you don't need the value from the list, it's conventional
+# to use an underscore as the variable.
+
+zeroes = [0 for _ in even_numbers]
+print(zeroes)  # ans: [0, 0, 0, 0, 0]
+
+# A list comprehension can include multiple fors:
+
+pairs = [(x, y)
+         for x in range(10)
+         for y in range(10)
+         ]
+print(pairs)
+
+increasing_pairs = [(x, y)
+                    for x in range(10)
+                    for y in range(x+1, 10)
+                    ]
+
+print(increasing_pairs)
+
+# List comprehensions are used almost everywhere
+
+# Generators and Iterators
+# A generator is something that you can iterate over
+# but whose values are produced only as needed(lazily).
+
+# creating a generator
+def lazy_range(n):
+    i = 0
+    while i < n:
+        yield i
+        i += 1
+
+for i in lazy_range(10000):
+    print(i)
+    if i == 2135:
+        break
+
+# In python 3 range itself is lazy. So we can create infinit sequence
+def natural_numbers():
+    i = 1
+    while True:
+        yield i
+        i += 1
+
+lazy_evens_below_20 = (x for x in lazy_range(20) if x % 2 == 0)
+print(lazy_evens_below_20)  # output: <generator object <genexpr> at 0x00000159BF195258>
+print(list(lazy_evens_below_20))  # output: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
+
+# Randomness
+import random
+
+# random.random() produces numbers uniformly between 0 and 1
+four_uniform_randoms = [random.random() for _ in range(4)]
+print(four_uniform_randoms)  # [0.9959300131135868, 0.9672660103214821, 0.323568384329169, 0.5024164052421923]
+
+random.seed(10)  # for reproducible random numbers
+print(random.random())  # output: 0.5714025946899135
+
+random.randrange(10)  # range = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+random.randrange(3, 10)  # range = [3, 4, 5, 6, 7, 8, 9]
+
+up_to_ten = list(range(10))
+random.shuffle(up_to_ten)
+print(up_to_ten)
+
+# if you need to pick one element from a list you can use random.choice
+my_best_friend = random.choice(["Alice", "Bob", "Charlie", "Debie"])
+print(my_best_friend)  # output: Bob
+
+# randomly choose a sample of elements without replacement, we can use random.sample()
+lottery_numbers = range(60)
+random.sample(lottery_numbers, 6)  # output: [38, 22, 24, 26, 18, 52]
+
+# To randomly choose a sample of elements with replacement, we can use random.choice()
+[random.choice(range(10)) for _ in range(4)]  # output: [9, 0, 3, 2]
+
+
+# Regular Expressions
+# They provide a way of searching text.
+
+import re
+
+print(re.match("a", "cat"))  # output: None
+print(not re.match("a", "cat"))  # output: True (as None is considered to be False in Python)
+re.search("a", "cat")
+not re.search("c","dog")
+len(re.split("[ab]", "carbs")) == 3
+"R-D-" == re.sub("[0-9]", "-", "R2D2")  # replace digits with dashes
+
+print(all([not re.match("a", "cat"), re.search("a", "cat"), not re.search("c","dog"), \
+           len(re.split("[ab]", "carbs")) == 3, "R-D-" == re.sub("[0-9]", "-", "R2D2")]))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
