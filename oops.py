@@ -41,6 +41,7 @@ class Set():
 
 
 set_obj = Set([2, 3, 4, 5])
+print(set_obj)
 set_obj.remove(3)
 set_obj.add(3)
 set_obj.contains(3)
